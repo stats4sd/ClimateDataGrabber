@@ -17,7 +17,7 @@ library(vegan) # Shannon Diversity Index
 library(dplyr)
 library(DT)
 library(leaflet)
-#library(kableExtra)
+library(knitr)
 
 source("download_nasapower.R")
 # Define UI for application that draws a histogram
