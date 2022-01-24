@@ -17,7 +17,7 @@ library(vegan) # Shannon Diversity Index
 library(dplyr)
 library(DT)
 library(leaflet)
-
+library(kableExtra)
 
 source("download_nasapower.R")
 # Define UI for application that draws a histogram
@@ -45,8 +45,7 @@ ui <- fluidPage(
                    value = 36,step =0.1 ),
       dateRangeInput("dates",
                      "Date Range",start=as.Date("2015-01-01"),
-                     end=as.Date("2021-01-01"),min =as.Date("1981-01-01"),
-                     max =as.Date(today())
+                     end=as.Date("2022-01-01")
       ),
       textInput("label","Enter ID Label",value="My Site"),
       actionButton("go","Get Data")
@@ -56,14 +55,16 @@ ui <- fluidPage(
     mainPanel(
       tabsetPanel(
         tabPanel("Location",textOutput("message"),leafletOutput("map")),
-        tabPanel("Data view",    DTOutput("data1")),
-        tabPanel("Data download",
-                 selectInput(inputId = "style",label ="Output data format",
-                             choices = c("","Full Data","Daycent Input") ),
-                 conditionalPanel("input.style!='' & input.go!=0",
-                                  downloadLink('downloadData', 'Download Data'))),
+        tabPanel("Data view",conditionalPanel("input.go!=0",
+             selectInput(inputId = "style",label ="Output data format",
+                  choices = c("","Full Data","Daycent Input") ),
+               conditionalPanel("input.style!=''",
+              downloadLink('downloadData', 'Click to Download Data'))),DTOutput("data1")),
+        tabPanel("Info",
+                 htmlOutput("info"),htmlOutput("meta")
+        )
         
-        tabPanel("Info",textOutput("info")))
+        )
     )
   )
   
@@ -75,12 +76,23 @@ server <- function(input, output) {
   
   out_data<-NULL
   out_data1<-NULL
+  metadata1<-read.csv("metadata.csv")
+  
+  
+  output$meta <- renderText({
+    kable(metadata1) %>%
+      kable_styling(
+        font_size = 15,
+        bootstrap_options = c("striped", "hover", "condensed")
+      ) 
+  })
+  
   
   
   output$info<-renderText({
-    paste("These data were obtained from the NASA Langley Research Center POWER Project funded through the NASA Earth Science Directorate Applied Science Program via the nasapower R library. \n\n
+    HTML(paste("These data were obtained from the NASA Langley Research Center POWER Project funded through the NASA Earth Science Directorate Applied Science Program via the nasapower R library. \n\n
       Data available from 1981 onwards only.\n\n
-            Metadata and other information to be added here")
+      Further information available from <a href='https://docs.ropensci.org/nasapower/'>Here</a><br><br>"))
   })
   
   output$map<-renderLeaflet({
@@ -96,24 +108,37 @@ server <- function(input, output) {
   })
   
   observeEvent(input$go,{
-    
+    out_data<-NULL
     if(as.Date(input$dates[1])<as.Date("1981-01-01")){
       min_date<-"1981-01-01"
     }
     else{
       min_date<-input$dates[1]
     }
-    
+    if(as.Date(input$dates[2])>as.Date("2022-01-01")){
+      max_date<-"2022-01-01"
+    }
+    else{
+      max_date<-input$dates[2]
+    }
     out_data<- download_nasapower(Start=as.character(min_date),
-                                  End=as.character(input$dates[2]),
+                                  End=as.character(max_date),
                                   longitude=as.numeric(input$longitude),
                                   latitude =as.numeric(input$latitude) ,
                                   ID=input$label,map = FALSE)
     
     
     output$message<-renderText({
+      m<-""
       if(nrow(out_data)>0){
-        paste(nrow(out_data),"observations succesfully obtained in range",
+        
+        if(as.Date(input$dates[1])<as.Date("1981-01-01")){
+          m<-"No data available before 1981.\n"
+        }
+        if(as.Date(input$dates[2])>as.Date("2022-01-01")){
+          m<-paste(m,"No data available after 2021. \n")
+        }
+        paste(m,nrow(out_data),"observations succesfully obtained in range",
               as.character(min(out_data$Date)),"to",
               as.character(max(out_data$Date)))
       }
@@ -123,8 +148,7 @@ server <- function(input, output) {
       
     })
     output$data1<-DT::renderDT(out_data)
-    
-    
+
     
     output$downloadData <- downloadHandler(
       

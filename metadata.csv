@@ -1,0 +1,5 @@
+"varname","name","units","temporal","definition","source","community"
+"tmin","Temperature at 2 Meters Minimum","C","DAILY","The minimum hourly air (dry bulb) temperature at 2 meters above the surface of the earth in the period of interest.","POWER","AG"
+"tmax","Temperature at 2 Meters Maximum","C","DAILY","The maximum hourly air (dry bulb) temperature at 2 meters above the surface of the earth in the period of interest.","POWER","AG"
+"rh","Relative Humidity at 2 Meters","%","DAILY","The ratio of actual partial pressure of water vapor to the partial pressure at saturation, expressed in percent.","POWER","AG"
+"prec","Precipitation Corrected","mm/day","DAILY","The bias corrected average of total precipitation at the surface of the earth in water mass (includes water content in snow).","MERRA2","AG"
