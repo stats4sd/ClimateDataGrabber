@@ -18,7 +18,7 @@ library(dplyr)
 library(DT)
 library(leaflet)
 library(knitr)
-
+library(kableExtra)
 source("download_nasapower.R")
 # Define UI for application that draws a histogram
 ui <- fluidPage(
