@@ -160,7 +160,8 @@ server <- function(input, output) {
           write.csv(out_data, con,row.names=FALSE)
         }
         if(input$style=="Daycent Input"){
-          write.table( dplyr::select(out_data,DOY,MM,YEAR,DD,tmax,tmin,prec),
+          write.table(
+            out_data %>% mutate(prec=prec/10) %>% dplyr::select(DOY,MM,YEAR,DD,tmax,tmin,prec),
                      con,row.names=FALSE,col.names = FALSE,sep=",")
         }
       }
