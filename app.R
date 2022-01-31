@@ -47,7 +47,8 @@ ui <- fluidPage(
                      "Date Range",start=as.Date("2015-01-01"),
                      end=as.Date("2022-01-01")
       ),
-      textInput("label","Enter ID Label",value="My Site"),
+      textOutput("txt1"),
+      textInput("label","(Optional) Enter ID Label",value="My Site"),
       actionButton("go","Get Data")
     ),
     
@@ -94,6 +95,8 @@ server <- function(input, output) {
       Data available from 1981 onwards only.\n\n
       Further information available from <a href='https://docs.ropensci.org/nasapower/'>Here</a><br><br>"))
   })
+  output$txt1<-renderText({
+    HTML("NOTE: Data available from 1981/01/01 to 2021/01/01")})
   
   output$map<-renderLeaflet({
     
