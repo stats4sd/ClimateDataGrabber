@@ -45,7 +45,7 @@ ui <- fluidPage(
                    value = 36,step =0.1 ),
       dateRangeInput("dates",
                      "Date Range",start=as.Date("2015-01-01"),
-                     end=as.Date("2022-01-01")
+                     end=as.Date("2021-12-31")
       ),
       textOutput("txt1"),
       textInput("label","(Optional) Enter ID Label",value="My Site"),
@@ -96,7 +96,7 @@ server <- function(input, output) {
       Further information available from <a href='https://docs.ropensci.org/nasapower/'>Here</a><br><br>"))
   })
   output$txt1<-renderText({
-    HTML("NOTE: Data available from 1981/01/01 to 2021/01/01")})
+    HTML("NOTE: Data available from 1981/01/01 to 2021/31/12")})
   
   output$map<-renderLeaflet({
     
@@ -118,8 +118,8 @@ server <- function(input, output) {
     else{
       min_date<-input$dates[1]
     }
-    if(as.Date(input$dates[2])>as.Date("2022-01-01")){
-      max_date<-"2022-01-01"
+    if(as.Date(input$dates[2])>as.Date("2021-12-31")){
+      max_date<-"2021-12-31"
     }
     else{
       max_date<-input$dates[2]
@@ -138,8 +138,8 @@ server <- function(input, output) {
         if(as.Date(input$dates[1])<as.Date("1981-01-01")){
           m<-"No data available before 1981.\n"
         }
-        if(as.Date(input$dates[2])>as.Date("2022-01-01")){
-          m<-paste(m,"No data available after 2021. \n")
+        if(as.Date(input$dates[2])>as.Date("2021-12-31")){
+          m<-paste(m,"No data available after 31st December 2021. \n")
         }
         paste(m,nrow(out_data),"observations succesfully obtained in range",
               as.character(min(out_data$Date)),"to",
@@ -164,7 +164,7 @@ server <- function(input, output) {
         }
         if(input$style=="Daycent Input"){
           write.table(
-            out_data %>% mutate(prec=prec/10) %>% dplyr::select(DOY,MM,YEAR,DD,tmax,tmin,prec),
+            out_data %>% mutate(prec=prec/10) %>% dplyr::select(DD,MM,YEAR,DOY,tmax,tmin,prec),
                      con,row.names=FALSE,col.names = FALSE,sep=",")
         }
       }
