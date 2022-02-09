@@ -150,13 +150,30 @@ server <- function(input, output) {
       }
       
     })
-    output$data1<-DT::renderDT(out_data)
+    output$data1<-DT::renderDT({
+      
+      
+      if(input$style=="Daycent Input"){
+        out_data1<-out_data %>% mutate(prec=prec/10) %>% 
+        dplyr::select(DD,MM,YEAR,DOY,tmax,tmin,prec)
+      }
+      else{
+        out_data1<-out_data
+      }
+      out_data1
+      
+      })
 
     
     output$downloadData <- downloadHandler(
       
       filename = function() {
+        if(input$style=="Full Data"){
         paste(input$label,'-', Sys.Date(), '.csv', sep='')
+        }
+        else{
+          paste(input$label,'-', Sys.Date(), '.wth', sep='')
+        }
       },
       content = function(con) {
         if(input$style=="Full Data"){
@@ -164,8 +181,9 @@ server <- function(input, output) {
         }
         if(input$style=="Daycent Input"){
           write.table(
-            out_data %>% mutate(prec=prec/10) %>% dplyr::select(DD,MM,YEAR,DOY,tmax,tmin,prec),
-                     con,row.names=FALSE,col.names = FALSE,sep=",")
+            out_data %>% mutate(prec=prec/10) %>% 
+              dplyr::select(DD,MM,YEAR,DOY,tmax,tmin,prec),
+                     con,row.names=FALSE,col.names = FALSE)
         }
       }
     )
